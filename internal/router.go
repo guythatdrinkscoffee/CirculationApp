@@ -2,17 +2,17 @@ package internal
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/guythatdrinkscoffee/CirculationApp/api"
+	"github.com/guythatdrinkscoffee/CirculationApp/api/controllers"
 )
 
 type CirculationRouter struct {
 	Router     *gin.Engine
-	Controller *api.CirculationController
+	Controller *controllers.CirculationController
 }
 
 func NewCirculationRouter() CirculationRouter {
 	r := gin.Default()
-	c := api.NewCirculationController()
+	c := controllers.NewCirculationController()
 	return CirculationRouter{
 		Router:     r,
 		Controller: c,
@@ -20,10 +20,11 @@ func NewCirculationRouter() CirculationRouter {
 }
 
 func (g *CirculationRouter) SetupRoutes() {
-	public := g.Router.Group("/")
+	api := g.Router.Group("/api/v1")
 	{
-		//Signup a user
-		public.GET("/", nil)
+		//Convert a currency to all the available rates with a code parameter in the path
+		api.GET("/convert/:code", nil)
+
 	}
 
 }

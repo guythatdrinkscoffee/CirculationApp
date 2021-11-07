@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type Result struct {
+type APIResponse struct {
 	BaseCurrencyCode string          `json:"base_currency_code"`
 	BaseCurrencyName string          `json:"base_currency_name"`
 	Amount           string          `json:"amount"`
@@ -20,7 +20,7 @@ type Rate struct {
 	RateForAmount string `json:"rate_for_amount"`
 }
 
-func (a *Result) FromJSON(r io.Reader) error {
+func (a *APIResponse) FromJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	return dec.Decode(a)
 }

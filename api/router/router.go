@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/guythatdrinkscoffee/CirculationApp/api/services"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
-	"github.com/guythatdrinkscoffee/CirculationApp/models"
 	"log"
 )
 
@@ -14,47 +13,50 @@ type CirculationRouter struct {
 	CacheValidator *CacheValidator
 }
 
-func NewCirculationRouter(s *internal.TTLCache) CirculationRouter {
+func NewCirculationRouter(c *internal.TTLCache) CirculationRouter {
 	r := gin.Default()
-	c := NewCacheValidator(s)
+	cv := NewCacheValidator(c)
 	return CirculationRouter{
 		Router:         r,
-		Cache:          s,
-		CacheValidator: c,
+		Cache:          c,
+		CacheValidator: cv,
 	}
 }
 
 func (g *CirculationRouter) SetupRoutes() {
-	convertToAllRoute := g.Router.Group("/api/v1/convert").Use(g.CacheValidator.CheckCache)
+	convert := g.Router.Group("/api/v1").Use(g.CacheValidator.CheckCache)
 	{
 		//Convert a currency to all the available rates with a code parameter in the path
-		convertToAllRoute.GET("/:code", func(ctx *gin.Context) {
-			//Print that the request was made.
-			log.Println("Request was made")
+		convert.POST("/convert", func(ctx *gin.Context) {
+			log.Println("The uri did not exist in the cache. Make the request")
 
-			//Grab the currency code from the Params
-			code := ctx.Param("code")
+			//Get the uri
+			uri := ctx.Request.RequestURI
 
-			//Make the call to the api with the currency code
-			results, err := services.ConvertFromToAll(code)
+			//Get the query params
+			base := ctx.Query("from")
+			dest := ctx.Query("to")
+			amount := ctx.Query("amount")
 
-			//If the api call results in an error then abort
+			//Make the request to the api
+			res, err := services.MakeRequestWith(base, dest, amount)
+
 			if err != nil {
 				ctx.JSON(500, err)
 				ctx.Abort()
 				return
 			}
 
-			_ = g.Cache.Set(code, results)
-
-			res := &models.CirculationResponse{
-				BaseCurrencyCode: results.BaseCurrencyCode,
-				Rates:            results.Rates,
+			//Set the value in the cache for the uri
+			err = g.Cache.Set(uri, res)
+			if err != nil {
+				ctx.JSON(500, err)
+				ctx.Abort()
+				return
 			}
 
 			ctx.AbortWithStatusJSON(200, res)
 		})
-
 	}
 
 }

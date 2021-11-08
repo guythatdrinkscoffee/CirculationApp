@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var storage internal.TTLCache
+var ttlC internal.TTLCache
 
 func init() {
 
@@ -24,13 +24,13 @@ func init() {
 
 	log.Println("Successfully loaded the .env file")
 
-	//Init a new storage(cache)
-	storage = internal.NewStorage()
+	//Init a new ttlC(cache)
+	ttlC = internal.NewTLLCache()
 }
 
 func main() {
 	//Define the Gin Router
-	r := router.NewCirculationRouter(&storage)
+	r := router.NewCirculationRouter(&ttlC)
 	r.SetupRoutes()
 
 	//Define a server in order to handle graceful shutdown
@@ -52,6 +52,10 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	msg := <-sigChan
 	log.Printf("Shutting down server with %s", msg)
+
+	//Clear the cache
+	log.Println("Closing the cache")
+	_ = ttlC.Cache.Close()
 
 	ctx, term := context.WithTimeout(context.Background(), 5*time.Second)
 	defer term()

@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewStorage(t *testing.T) {
-	st := NewStorage()
+	st := NewTLLCache()
 	assert.NotNil(t, st)
 }
 
@@ -15,7 +15,7 @@ func TestTTLCache_Set(t *testing.T) {
 	code := "USD"
 
 	//Initialize a new storage
-	st := NewStorage()
+	st := NewTLLCache()
 
 	//Set a new ApiResponse test model
 	res := &models.APIResponse{
@@ -38,7 +38,7 @@ func TestTTLCache_Get(t *testing.T) {
 	code := "USD"
 
 	//Initialize a new storage
-	st := NewStorage()
+	st := NewTLLCache()
 
 	//Set a new ApiResponse test model
 	res := &models.APIResponse{

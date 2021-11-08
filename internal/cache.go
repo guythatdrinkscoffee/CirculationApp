@@ -12,7 +12,7 @@ type TTLCache struct {
 	Cache ttlcache.SimpleCache
 }
 
-func NewStorage() TTLCache {
+func NewTLLCache() TTLCache {
 	c := ttlcache.NewCache()
 	return TTLCache{
 		Cache: c,

@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/guythatdrinkscoffee/CirculationApp/Utils"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
 	"log"
 )
@@ -18,21 +17,21 @@ func NewCacheValidator(s *internal.TTLCache) *CacheValidator {
 }
 
 func (c CacheValidator) CheckCache(ctx *gin.Context) {
-	code := ctx.Param("code")
+	//Grab the uri from the request
+	uri := ctx.Request.RequestURI
 
-	if !Utils.CodeIsValid(code) {
-		ctx.JSON(400, "Invalid currency code")
-		ctx.Abort()
-		return
-	}
+	log.Println(uri)
+	//Check the cache if the uri exists
+	res, err := c.Storage.Get(uri)
 
-	res, err := c.Storage.Get(code)
-
+	//If err is not nil, then the uri does not exist in the
+	//cache. Call ctx.next() to make the appropriate request
+	//for the uri.
 	if err != nil {
-		log.Println("Response not found in cache")
 		ctx.Next()
 		return
 	}
 
-	ctx.AbortWithStatusJSON(200, res.Rates)
+	//The uri did exist in the cache so return the value
+	ctx.AbortWithStatusJSON(200, res)
 }

@@ -17,8 +17,22 @@ func init() {
 	endpoints = models.NewEndpoints()
 }
 
+func MakeRequestWith(base string, dest string, amount string) (*models.APIResponse, error) {
+	if len(dest) == 0 && len(amount) == 0 {
+		//No destination currency or amount was passed so
+		//make an api request to convert a single currency to
+		//all of the available currencies.
+		return convertFromToAll(base)
+	} else {
+		if len(amount) == 0 {
+			amount = "1"
+		}
+		return convertFromToWithAmount(base, dest, amount)
+	}
+}
+
 // ConvertFromToAll Returns all the exchange rates for the provided currency code.
-func ConvertFromToAll(code string) (*models.APIResponse, error) {
+func convertFromToAll(code string) (*models.APIResponse, error) {
 	//Build the request url`
 	reqUrl := fmt.Sprintf("%s&from=%s&amount=1", endpoints.Convert, code)
 
@@ -58,9 +72,9 @@ func ConvertFromToAll(code string) (*models.APIResponse, error) {
 }
 
 // ConvertFromToWithAmount Converts one currency to another with a given amount
-func ConvertFromToWithAmount(base string, derived string, amount float32) (*models.APIResponse, error) {
+func convertFromToWithAmount(base string, derived string, amount string) (*models.APIResponse, error) {
 	//Build the request url
-	reqUrl := fmt.Sprintf("%s&from=%s&to=%s&amount=%f", endpoints.Convert, base, derived, amount)
+	reqUrl := fmt.Sprintf("%s&from=%s&to=%s&amount=%s", endpoints.Convert, base, derived, amount)
 
 	//Define the request
 	req, err := buildRequest("GET", reqUrl)

@@ -4,28 +4,31 @@ import (
 	"errors"
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/guythatdrinkscoffee/CirculationApp/models"
+	"log"
 	"time"
 )
 
 type TTLCache struct {
-	cache ttlcache.SimpleCache
+	Cache ttlcache.SimpleCache
 }
 
 func NewStorage() TTLCache {
 	c := ttlcache.NewCache()
 	return TTLCache{
-		cache: c,
+		Cache: c,
 	}
 }
 
-func (s TTLCache) Get(code string) (models.CurrencyRates, error) {
-	val, err := s.cache.Get(code)
+func (s TTLCache) Get(code string) (*models.APIResponse, error) {
+	val, err := s.Cache.Get(code)
 
 	if err != nil {
-		return nil, err
+		return nil, ttlcache.ErrNotFound
 	}
 
-	return val.(models.CurrencyRates), nil
+	log.Println("Response found in Cache.")
+
+	return val.(*models.APIResponse), nil
 }
 
 func (s TTLCache) Set(code string, value interface{}) error {
@@ -34,11 +37,13 @@ func (s TTLCache) Set(code string, value interface{}) error {
 		return err
 	}
 
-	err := s.cache.SetWithTTL(code, value, time.Hour)
+	err := s.Cache.SetWithTTL(code, value, time.Hour)
 
 	if err != nil {
 		return err
 	}
+
+	log.Println("Inserted into Cache")
 
 	return nil
 }

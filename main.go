@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/guythatdrinkscoffee/CirculationApp/api/router"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
 	"github.com/joho/godotenv"
 	"log"
@@ -12,19 +13,24 @@ import (
 	"time"
 )
 
+var storage internal.TTLCache
+
 func init() {
 
 	//Attempt to load the .env file
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalln(err)
 	}
+
 	log.Println("Successfully loaded the .env file")
 
+	//Init a new storage(cache)
+	storage = internal.NewStorage()
 }
 
 func main() {
 	//Define the Gin Router
-	r := internal.NewCirculationRouter()
+	r := router.NewCirculationRouter(&storage)
 	r.SetupRoutes()
 
 	//Define a server in order to handle graceful shutdown

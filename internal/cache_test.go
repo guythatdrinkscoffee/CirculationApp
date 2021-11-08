@@ -30,7 +30,7 @@ func TestTTLCache_Set(t *testing.T) {
 		},
 	}
 
-	setErr := st.Set(code, res.Rates)
+	setErr := st.Set(code, res)
 	assert.Nil(t, setErr)
 }
 
@@ -53,8 +53,8 @@ func TestTTLCache_Get(t *testing.T) {
 		},
 	}
 
-	//Insert the ApiResponse test case into the cache
-	setErr := st.Set(code, res.Rates)
+	//Insert the ApiResponse test case into the Cache
+	setErr := st.Set(code, res)
 	assert.Nil(t, setErr)
 
 	//Test the GET returns the correct results
@@ -62,4 +62,5 @@ func TestTTLCache_Get(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, val)
+	assert.Equal(t, res.Rates, val.Rates)
 }

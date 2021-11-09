@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/guythatdrinkscoffee/CirculationApp/api/middlewares"
 	"github.com/guythatdrinkscoffee/CirculationApp/api/services"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
 	"log"
@@ -10,12 +11,12 @@ import (
 type CirculationRouter struct {
 	Router         *gin.Engine
 	Cache          *internal.TTLCache
-	CacheValidator *CacheValidator
+	CacheValidator *middlewares.CacheValidator
 }
 
 func NewCirculationRouter(c *internal.TTLCache) CirculationRouter {
 	r := gin.Default()
-	cv := NewCacheValidator(c)
+	cv := middlewares.NewCacheValidator(c)
 	return CirculationRouter{
 		Router:         r,
 		Cache:          c,

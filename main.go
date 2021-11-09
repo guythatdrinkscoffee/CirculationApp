@@ -60,6 +60,6 @@ func main() {
 	ctx, term := context.WithTimeout(context.Background(), 5*time.Second)
 	defer term()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Forced server shutdown: ", err)
+		log.Fatalf("Forced server shutdown: %s", err)
 	}
 }

@@ -47,8 +47,8 @@ func (suite *APITestSuite) TestMakeRequestWith() {
 	assert.Greaterf(suite.T(), len(apiRes.Rates), 0, "error message %s", "formatted")
 
 	//Timer is needed if the API plan is on basic. The basic plan only allows one call per second
-	//Therefore, the testing suite makes a call and waits a second between the followi
-	time.Sleep(1 * time.Second)
+	//Therefore, the testing suite makes a call and tjen sleeps before making the second call
+	time.Sleep(2 * time.Second)
 }
 
 //Make a request with a base, destination and amount.

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/guythatdrinkscoffee/CirculationApp/api/router"
+	"github.com/guythatdrinkscoffee/CirculationApp/config"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -13,24 +13,20 @@ import (
 	"time"
 )
 
-var ttlC internal.TTLCache
+var ttlC *internal.TTLCache
+var c *config.Config
 
 func init() {
-
-	//Attempt to load the .env file
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println("Successfully loaded the .env file")
-
 	//Init a new ttlC(cache)
 	ttlC = internal.NewTLLCache()
+	c = config.GetConfig()
 }
 
 func main() {
+	ginMode := c.GIN_MODE
+
 	//Define the Gin Router
-	r := router.NewCirculationRouter(&ttlC)
+	r := router.NewCirculationRouter(ttlC, ginMode)
 	r.SetupRoutes()
 
 	//Define a server in order to handle graceful shutdown

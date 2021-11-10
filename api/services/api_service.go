@@ -2,11 +2,11 @@ package services
 
 import (
 	"fmt"
+	"github.com/guythatdrinkscoffee/CirculationApp/config"
 	"github.com/guythatdrinkscoffee/CirculationApp/models"
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 var (
@@ -111,6 +111,7 @@ func convertFromToWithAmount(base string, derived string, amount string) (*model
 
 //A util function to apply the needed headers and build the request
 func buildRequest(method string, url string) (*http.Request, error) {
+	c := config.GetConfig()
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
@@ -120,7 +121,7 @@ func buildRequest(method string, url string) (*http.Request, error) {
 	//add the appropriate headers
 	//Add the application specific headers
 	req.Header.Add("x-rapidapi-host", "currency-converter5.p.rapidapi.com")
-	req.Header.Add("x-rapidapi-key", os.Getenv("APP_KEY"))
+	req.Header.Add("x-rapidapi-key", c.APP_KEY)
 
 	return req, nil
 }

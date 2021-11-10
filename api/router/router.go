@@ -14,9 +14,16 @@ type CirculationRouter struct {
 	CacheValidator *middlewares.CacheValidator
 }
 
-func NewCirculationRouter(c *internal.TTLCache) CirculationRouter {
+func NewCirculationRouter(c *internal.TTLCache, mode string) CirculationRouter {
+	//Set the mode for the engine(production or debug)
+	gin.SetMode(mode)
+
+	//Define the Router with a default gin engine
 	r := gin.Default()
+
+	//Define cache and pass it into the CacheValidator
 	cv := middlewares.NewCacheValidator(c)
+
 	return CirculationRouter{
 		Router:         r,
 		Cache:          c,

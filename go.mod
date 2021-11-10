@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/ReneKroon/ttlcache/v2 v2.9.0
 	github.com/gin-gonic/gin v1.7.4
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/joho/godotenv v1.4.0
 	github.com/stretchr/testify v1.7.0
 )
@@ -25,6 +26,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
+	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
 	golang.org/x/tools v0.1.0 // indirect

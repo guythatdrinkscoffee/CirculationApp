@@ -12,7 +12,7 @@ func TestNewCacheValidator(t *testing.T) {
 	s := internal.NewTLLCache()
 
 	//The CacheValidator takes in a TTLCache
-	c := NewCacheValidator(&s)
+	c := NewCacheValidator(s)
 
 	assert.NotNil(t, c)
 }
@@ -20,7 +20,7 @@ func TestNewCacheValidator(t *testing.T) {
 func TestCacheValidator_CheckCache(t *testing.T) {
 	s := internal.NewTLLCache()
 
-	c := NewCacheValidator(&s)
+	c := NewCacheValidator(s)
 
 	r := &models.APIResponse{
 		BaseCurrencyCode: "EUR",

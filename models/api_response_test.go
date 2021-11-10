@@ -20,7 +20,7 @@ func TestAPIResponse_FromJSON(t *testing.T) {
 	bodyBytes := new(bytes.Buffer)
 	encErr := json.NewEncoder(bodyBytes).Encode(resp)
 
-	assert.NotNil(t, encErr)
+	assert.Nil(t, encErr)
 
 	testRep := &APIResponse{}
 	err := testRep.FromJSON(bodyBytes)

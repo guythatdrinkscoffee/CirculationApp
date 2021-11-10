@@ -5,6 +5,7 @@ import (
 	"github.com/guythatdrinkscoffee/CirculationApp/api/middlewares"
 	"github.com/guythatdrinkscoffee/CirculationApp/api/services"
 	"github.com/guythatdrinkscoffee/CirculationApp/internal"
+	"github.com/guythatdrinkscoffee/CirculationApp/models"
 	"log"
 )
 
@@ -48,15 +49,16 @@ func (g *CirculationRouter) SetupRoutes() {
 
 			//Make the request to the api
 			res, err := services.MakeRequestWith(base, dest, amount)
-
 			if err != nil {
-				ctx.JSON(500, err)
+				e := err.(*models.APIErrorResponse)
+				ctx.JSON(e.Result.Code, e.Error())
 				ctx.Abort()
 				return
 			}
 
 			//Set the value in the cache for the uri
 			err = g.Cache.Set(uri, res)
+
 			if err != nil {
 				ctx.JSON(500, err)
 				ctx.Abort()

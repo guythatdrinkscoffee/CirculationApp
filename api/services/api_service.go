@@ -17,7 +17,7 @@ func init() {
 	endpoints = models.NewEndpoints()
 }
 
-func MakeRequestWith(base string, dest string, amount string) (*models.APIResponse, error) {
+func MakeRequestWith(base string, dest string, amount string) (interface{}, error) {
 	if len(dest) == 0 && len(amount) == 0 {
 		//No destination currency or amount was passed so
 		//make an api request to convert a single currency to
@@ -32,7 +32,7 @@ func MakeRequestWith(base string, dest string, amount string) (*models.APIRespon
 }
 
 // ConvertFromToAll Returns all the exchange rates for the provided currency code.
-func convertFromToAll(code string) (*models.APIResponse, error) {
+func convertFromToAll(code string) (interface{}, error) {
 	//Build the request url`
 	reqUrl := fmt.Sprintf("%s&from=%s&amount=1", endpoints.Convert, code)
 
@@ -59,6 +59,11 @@ func convertFromToAll(code string) (*models.APIResponse, error) {
 		}
 	}(res.Body)
 
+	//Check that the response is OK
+	if res.StatusCode != 200 {
+		return buildAPIError(res.StatusCode), nil
+	}
+
 	results := &models.APIResponse{}
 
 	//Decode the body into a APIResponse
@@ -72,7 +77,7 @@ func convertFromToAll(code string) (*models.APIResponse, error) {
 }
 
 // ConvertFromToWithAmount Converts one currency to another with a given amount
-func convertFromToWithAmount(base string, derived string, amount string) (*models.APIResponse, error) {
+func convertFromToWithAmount(base string, derived string, amount string) (interface{}, error) {
 	//Build the request url
 	reqUrl := fmt.Sprintf("%s&from=%s&to=%s&amount=%s", endpoints.Convert, base, derived, amount)
 
@@ -98,6 +103,11 @@ func convertFromToWithAmount(base string, derived string, amount string) (*model
 		}
 	}(res.Body)
 
+	//Check that response is OK
+	if res.StatusCode != 200 {
+		return buildAPIError(res.StatusCode), nil
+	}
+
 	results := &models.APIResponse{}
 
 	err = results.FromJSON(res.Body)
@@ -109,7 +119,7 @@ func convertFromToWithAmount(base string, derived string, amount string) (*model
 	return results, nil
 }
 
-//A util function to apply the needed headers and build the request
+//buildRequest A util function to apply the needed headers and build the request
 func buildRequest(method string, url string) (*http.Request, error) {
 	c := config.GetConfig()
 	req, err := http.NewRequest(method, url, nil)
@@ -124,4 +134,29 @@ func buildRequest(method string, url string) (*http.Request, error) {
 	req.Header.Add("x-rapidapi-key", c.APP_KEY)
 
 	return req, nil
+}
+
+//
+func buildAPIError(code int) *models.APIErrorResponse {
+	apiErrorResp := models.APIErrorResponse{
+		Status: "failed",
+		Result: models.APIError{
+			Message: "",
+			Code:    code,
+		},
+	}
+
+	//Build the error
+	switch code {
+	case 400:
+		apiErrorResp.Result.Message = "Bad Request"
+	case 401:
+		apiErrorResp.Result.Message = "Authentication failed"
+	case 405:
+		apiErrorResp.Result.Message = "Method is not allowed"
+	case 500:
+		apiErrorResp.Result.Message = "Server error"
+	}
+
+	return &apiErrorResp
 }

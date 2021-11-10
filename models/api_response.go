@@ -22,6 +22,20 @@ type Rate struct {
 	RateForAmount string `json:"rate_for_amount"`
 }
 
+type APIErrorResponse struct {
+	Status string   `json:"status"`
+	Result APIError `json:"error"`
+}
+
+func (a *APIErrorResponse) Error() string {
+	return a.Result.Message
+}
+
+type APIError struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
+
 func (a *APIResponse) FromJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	return dec.Decode(a)

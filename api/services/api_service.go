@@ -17,7 +17,7 @@ func init() {
 	endpoints = models.NewEndpoints()
 }
 
-func MakeRequestWith(base string, dest string, amount string) (interface{}, error) {
+func MakeRequestWith(base string, dest string, amount string) (*models.APIResponse, *models.APIErrorResponse) {
 	if len(dest) == 0 && len(amount) == 0 {
 		//No destination currency or amount was passed so
 		//make an api request to convert a single currency to
@@ -32,7 +32,7 @@ func MakeRequestWith(base string, dest string, amount string) (interface{}, erro
 }
 
 // ConvertFromToAll Returns all the exchange rates for the provided currency code.
-func convertFromToAll(code string) (interface{}, error) {
+func convertFromToAll(code string) (*models.APIResponse, *models.APIErrorResponse) {
 	//Build the request url`
 	reqUrl := fmt.Sprintf("%s&from=%s&amount=1", endpoints.Convert, code)
 
@@ -40,7 +40,7 @@ func convertFromToAll(code string) (interface{}, error) {
 	req, err := buildRequest("GET", reqUrl)
 
 	if err != nil {
-		return nil, err
+		return nil, buildAPIError(400)
 	}
 
 	//Make the request through the default http client.
@@ -48,7 +48,7 @@ func convertFromToAll(code string) (interface{}, error) {
 
 	//If the request results in an error then return
 	if reqErr != nil {
-		return nil, reqErr
+		return nil, buildAPIError(400)
 	}
 
 	//Close the res
@@ -61,7 +61,7 @@ func convertFromToAll(code string) (interface{}, error) {
 
 	//Check that the response is OK
 	if res.StatusCode != 200 {
-		return buildAPIError(res.StatusCode), nil
+		return nil, buildAPIError(res.StatusCode)
 	}
 
 	results := &models.APIResponse{}
@@ -70,14 +70,14 @@ func convertFromToAll(code string) (interface{}, error) {
 	err = results.FromJSON(res.Body)
 
 	if err != nil {
-		return nil, err
+		return nil, buildAPIError(500)
 	}
 
 	return results, nil
 }
 
 // ConvertFromToWithAmount Converts one currency to another with a given amount
-func convertFromToWithAmount(base string, derived string, amount string) (interface{}, error) {
+func convertFromToWithAmount(base string, derived string, amount string) (*models.APIResponse, *models.APIErrorResponse) {
 	//Build the request url
 	reqUrl := fmt.Sprintf("%s&from=%s&to=%s&amount=%s", endpoints.Convert, base, derived, amount)
 
@@ -85,14 +85,14 @@ func convertFromToWithAmount(base string, derived string, amount string) (interf
 	req, err := buildRequest("GET", reqUrl)
 
 	if err != nil {
-		return nil, err
+		return nil, buildAPIError(400)
 	}
 
 	//Make the request
 	res, reqErr := http.DefaultClient.Do(req)
 
 	if reqErr != nil {
-		return nil, reqErr
+		return nil, buildAPIError(400)
 	}
 
 	//Close the res
@@ -105,7 +105,7 @@ func convertFromToWithAmount(base string, derived string, amount string) (interf
 
 	//Check that response is OK
 	if res.StatusCode != 200 {
-		return buildAPIError(res.StatusCode), nil
+		return nil, buildAPIError(res.StatusCode)
 	}
 
 	results := &models.APIResponse{}
@@ -113,7 +113,7 @@ func convertFromToWithAmount(base string, derived string, amount string) (interf
 	err = results.FromJSON(res.Body)
 
 	if err != nil {
-		return nil, err
+		return nil, buildAPIError(500)
 	}
 
 	return results, nil

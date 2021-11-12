@@ -31,7 +31,7 @@ func main() {
 
 	//Define a server in order to handle graceful shutdown
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + c.PORT,
 		Handler: r.Router,
 	}
 
